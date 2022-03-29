@@ -11,7 +11,7 @@ Just install the latest release from the [Releases tab](https://github.com/TheDu
 * ``hostfxr.h``
 * ``nethost.h``
 * ``nethost.lib`` or ``nethost.dll`` or ``nethost.so``
-Make sure to include the needed headers and libraries from [NativeHost.Native/include](NativeHost.Native/include) and [NativeHost.Native/include](NativeHost.Native/lib).
+Make sure to include the needed headers and libraries from [NativeHost.Native/include](NativeHost.Native/include) and [NativeHost.Native/lib](NativeHost.Native/lib).
 
 You can also get the headers from the dotnet runtime repo:
 * ``coreclr_delegates.h`` - https://github.com/dotnet/runtime/blob/main/src/native/corehost/coreclr_delegates.h
