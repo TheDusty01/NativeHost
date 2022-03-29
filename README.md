@@ -2,7 +2,7 @@
 A small header-only crossplatform library which makes it easier to host the CoreCLR runtime inside of an native app.
 For more information on this topic check out the [.NET Documentation](https://docs.microsoft.com/en-us/dotnet/core/tutorials/netcore-hosting) and [this article]( https://github.com/dotnet/runtime/blob/main/docs/design/features/native-hosting.md) on the [dotnet/runtime repo](https://github.com/dotnet/runtime) about the API design.
 
-The goal of this repo is to also show off the common use cases with the CLR host and should act as a small showcase of the current possibilities with it.
+The goal of this repo is to also show off the common use cases with the CLR host and should act as a small showcase of the current possibilities with it (since the documentation on this is pretty narrow at the moment).
 
 ## Setup
 Just install the latest release from the [Releases tab](https://github.com/TheDusty01/NativeHost/releases).
