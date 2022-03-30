@@ -11,22 +11,23 @@ Just install the latest release from the [Releases tab](https://github.com/TheDu
 * ``hostfxr.h``
 * ``nethost.h``
 * ``nethost.lib`` or ``nethost.dll`` or ``nethost.so``
+
 Make sure to include the needed headers and libraries from [NativeHost.Native/include](NativeHost.Native/include) and [NativeHost.Native/lib](NativeHost.Native/lib).
 
 You can also get the headers from the dotnet runtime repo:
-* ``coreclr_delegates.h`` - https://github.com/dotnet/runtime/blob/main/src/native/corehost/coreclr_delegates.h
-* ``hostfxr.h`` - https://github.com/dotnet/runtime/blob/main/src/native/corehost/hostfxr.h
-* ``nethost.h`` - https://github.com/dotnet/runtime/blob/main/src/native/corehost/nethost/nethost.h
+* [``coreclr_delegates.h``](https://github.com/dotnet/runtime/blob/main/src/native/corehost/coreclr_delegates.h)
+* [``hostfxr.h``](https://github.com/dotnet/runtime/blob/main/src/native/corehost/hostfxr.h)
+* [``nethost.h``](https://github.com/dotnet/runtime/blob/main/src/native/corehost/nethost/nethost.h)
 * ``nethost.lib``, ``nethost.dll``, ``nethost.so`` - Can be found in your local dotnet installation
 
 ## Usage
 Don't forget to checkout the example project which contains various samples like calling a managed method with parameters like strings, calling an unmanaged method back from the managed context using function pointers and much more (check [Samples](https://github.com/TheDusty01/NativeHost#samples)).
 
 ### Creating a CLR host
-To create a CLR host you just need the path to the runtimeconfig.json file and to the managed assembly (DLL).
+To create a CLR host you just need the path to the runtimeconfig (more info on this below) and to the managed assembly (DLL).
 ```c++
-std::filesystem::path runtimeConfigPath = "Path" / "To" / "The" / "RuntimeConfig";
-std::filesystem::path assemblyPath = "Path" / "To" / "The" / "Assembly";
+std::filesystem::path runtimeConfigPath = "Path" / "To" / "The" / "AssemblyName.runtimeconfig.json";
+std::filesystem::path assemblyPath = "Path" / "To" / "The" / "AssemblyName.dll";
 
 CoreCLRResult rc = CoreCLRHost::Create(runtimeConfigPath, assemblyPath);
 if (rc != CoreCLRResult::Success)
