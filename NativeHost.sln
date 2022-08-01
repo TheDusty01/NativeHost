@@ -4,10 +4,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeHost.Native", "NativeHost.Native\NativeHost.Native.vcxproj", "{DD138A33-CE33-4AA5-9591-FF3A9F47FBA2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2ABEDD3C-6AE5-4A4C-BC2E-007BE4D3D131} = {2ABEDD3C-6AE5-4A4C-BC2E-007BE4D3D131}
+		{B6FE92BD-43E2-48D1-A42E-551322F2A646} = {B6FE92BD-43E2-48D1-A42E-551322F2A646}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NativeHost.ManagedLib", "NativeHost.ManagedLib\NativeHost.ManagedLib.csproj", "{B6FE92BD-43E2-48D1-A42E-551322F2A646}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeHost.ManagedLibTwo", "NativeHost.ManagedLibTwo\NativeHost.ManagedLibTwo.csproj", "{2ABEDD3C-6AE5-4A4C-BC2E-007BE4D3D131}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NativeHost.ManagedLibTwo", "NativeHost.ManagedLibTwo\NativeHost.ManagedLibTwo.csproj", "{2ABEDD3C-6AE5-4A4C-BC2E-007BE4D3D131}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -37,10 +37,10 @@ if (rc != CoreCLRResult::Success)
 }
 ```
 
-### Calling a method
+### Calling a managed method
 The following code calls the method ``public static void Main()`` inside of the ``NativeHost.ManagedLib.ManagedApi`` class (in the ``NativeHost.ManagedLib.dll`` assembly).
 ```c++
-const char_t* = STR("NativeHost.ManagedLib.ManagedApi, NativeHost.ManagedLib"); // Namespace.Class, AssemblyName
+const char_t* dotnetType = STR("NativeHost.ManagedLib.ManagedApi, NativeHost.ManagedLib"); // Namespace.Class, AssemblyName
 const char_t* methodName = STR("Main");
 
 using ClrMainFn = void (CORECLR_DELEGATE_CALLTYPE*)();
@@ -57,6 +57,9 @@ if (rc != CoreCLRResult::Success)
 // Call the method
 method();
 ```
+
+**Check below if you want to call a native method from .NET**
+
 
 ### Creating a managed (.NET) library
 Make sure to mark your methods with the ``UnmanagedCallersOnly`` attribute so they can be called from your host.
@@ -93,6 +96,81 @@ With the following contents you configure the runtime to use .NET 6 as the targe
 ```
 
 For more information about the options, check out the .NET Documentation on this topic: https://docs.microsoft.com/en-us/dotnet/core/runtime-config/threading.
+
+
+### Calling a native method
+To call a native method from .NET you have 2 options:
+* Use function pointers with delegates (check the Samples section)
+* Use the ``DllImport`` attribute with a custom ``DllImportResolver`` to call an exported function (recommended)
+
+The following will show how to use the ``DllImport`` attribute way.
+```cs
+namespace NativeHost.ManagedLib
+{
+    public class ManagedApi
+    {
+        public const string InternalDllImport = "__Internal";
+        public static IntPtr MainProgramHandle = IntPtr.Zero;
+        
+        [UnmanagedCallersOnly]
+        public static void Main(IntPtr mainProgramHandle)
+        {
+            Console.WriteLine($"C# Main");
+
+            MainProgramHandle = mainProgramHandle;
+
+            NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), (string libraryName, Assembly assembly, DllImportSearchPath? searchPath) =>
+            {
+                // If the library name equals our internal resolver name return the base address of the host
+                if (libraryName == InternalDllImport)
+                    return MainProgramHandle;
+
+                // Otherwise try to load the library
+                NativeLibrary.TryLoad(libraryName, assembly, searchPath, out IntPtr handle);
+                return handle;
+            });
+        }
+
+        [DllImport(InternalDllImport)]
+        internal static extern void SomeExportedFunction();
+    }
+}
+```
+Call the ``Main`` function from the host:
+```c++
+extern "C" __declspec(dllexport) void SomeExportedFunction()
+{
+    std::cout << "C++ SomeExportedFunction" << std::endl;
+}
+
+void CallMain()
+{
+    const char_t* dotnetType = STR("NativeHost.ManagedLib.ManagedApi, NativeHost.ManagedLib"); // Namespace.Class, AssemblyName
+    const char_t* methodName = STR("Main");
+
+    using ClrMainFn = void (CORECLR_DELEGATE_CALLTYPE*)(void*);
+
+    // Create a function pointer with the specified signature
+    ClrMainFn method = nullptr;
+    CoreCLRResult rc = CoreCLRHost::GetMethodFunctionPointer<ClrMainFn>(dotnetType, methodName, &method);
+    if (rc != CoreCLRResult::Success)
+    {
+        std::cout << "RC GetMethodFunctionPointer: " << (uint32_t)rc << std::endl;
+        return;
+    }
+
+    #if WINDOWS
+        void* mainProgramHandle = GetModuleHandleW(NULL);
+    #else
+        void* mainProgramHandle = dlopen(nullptr);
+    #endif
+
+    // Call the method
+    method(mainProgramHandle);
+}
+```
+Upon calling the ``Main`` function of the managed assembly, the managed assembly calls the native ``SomeExportedFunction`` function.
+
 
 ### Samples
 More samples like calling a managed method with parameters like strings, calling an unmanaged method back from the managed context using function pointers and much more can be found in the unamanged C++ project ([NativeHost.Native/NativeHost.Native.cpp](NativeHost.Native/NativeHost.Native.cpp)) and the managed C# library ([NativeHost.ManagedLib/ManagedApi.cs](NativeHost.ManagedLib/ManagedApi.cs)).

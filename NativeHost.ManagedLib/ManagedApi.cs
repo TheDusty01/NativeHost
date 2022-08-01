@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using NativeHost.ManagedLib;
 
@@ -15,11 +16,29 @@ namespace NativeHost.ManagedLib
         //delegate* unmanaged[Fastcall]<void> func
         //delegate* unmanaged[Thiscall]<void> func
 
+        public const string InternalDllImport = "__Internal";
+        public static IntPtr MainProgramHandle = IntPtr.Zero;
+
+        [DllImport(InternalDllImport/*, EntryPoint = "Test"*/)]
+        internal static extern void SomeExportedFunction();
 
         [UnmanagedCallersOnly]
-        public static void Main()
+        public static void Main(IntPtr mainProgramHandle)
         {
             Console.WriteLine($"C# Main");
+
+            MainProgramHandle = mainProgramHandle;
+
+            NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), (string libraryName, Assembly assembly, DllImportSearchPath? searchPath) =>
+            {
+                if (libraryName == InternalDllImport)
+                    return MainProgramHandle;
+
+                NativeLibrary.TryLoad(libraryName, assembly, searchPath, out IntPtr handle);
+                return handle;
+            });
+
+            SomeExportedFunction();
         }
 
         [UnmanagedCallersOnly]

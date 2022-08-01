@@ -10,6 +10,11 @@ void CallPrintAndReturn(const char_t* dotnetType);
 void CallDoStuff(const char_t* dotnetType);
 void CallDoStuffStruct(const char_t* dotnetType);
 
+extern "C" __declspec(dllexport) void SomeExportedFunction()
+{
+    std::cout << "C++ SomeExportedFunction" << std::endl;
+}
+
 int main(int argc, char* argv[])
 {
     char nativeHostExe[MAX_PATH];
@@ -47,7 +52,7 @@ void CallMain(const char_t* dotnetType)
     // Load managed assembly and get function pointer to a managed method
     const char_t* methodName = STR("Main");
 
-    using ClrMainFn = void (CORECLR_DELEGATE_CALLTYPE*)();
+    using ClrMainFn = void (CORECLR_DELEGATE_CALLTYPE*)(void*);
 
     ClrMainFn method = nullptr;
     CoreCLRResult rc = CoreCLRHost::GetMethodFunctionPointer<ClrMainFn>(dotnetType, methodName, &method);
@@ -57,8 +62,14 @@ void CallMain(const char_t* dotnetType)
         return;
     }
 
+#if WINDOWS
+    void* mainProgramHandle = GetModuleHandleW(NULL);
+#else
+    void* mainProgramHandle = dlopen(nullptr);
+#endif
+
     // Call the method
-    method();
+    method(mainProgramHandle);
 }
 
 void CallPrint(const char_t* dotnetType)
